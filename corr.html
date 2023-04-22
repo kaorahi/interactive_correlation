@@ -1,0 +1,56 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+ <meta charset="UTF-8" />
+ <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline'">
+ <title>Correlation</title>
+ <script defer src="corr.js"></script>
+ <style type="text/css">
+  #corr_box {font-size: large; margin-bottom: 1em;}
+  #corr:not(:empty) {color: black; border: solid 1px black; padding: 0.2em;}
+  #corr:empty::before {content: "?"; color: gray;}
+  #sample_size_span {color: gray; margin-left: 1em;}
+  #main_canvas_box, #main_canvas {margin: 0px; padding: 0px;}
+  #main_canvas {position: absolute; background: #eee;}
+  #control_box {margin-top: 0.5em;}
+  #coord {color: gray;}
+  #points_text_box {margin-top: 1em;}
+  #points_text {resize: none;}
+  #about {color: gray; margin-top: 1em;}
+ </style>
+</head>
+
+<body>
+
+<h1>Interactive Correlation</h1>
+
+<div id="corr_box">
+correlation = <span id="corr"></span>
+<span id="sample_size_span">(<span id="sample_size"></span> points)</span>
+</div>
+
+<div id="main_canvas_box">
+ <canvas id="main_canvas"></canvas>
+</div>
+
+<div id="control_box">
+ <button id="undo_all" onclick="undo_all()">clear</button>
+ <button id="undo" onclick="undo()">undo</button>
+ <button id="redo" onclick="redo()">redo</button>
+ <button id="redo_all" onclick="redo_all()">redo all</button>
+ <a id="download">Download image</a>
+ <span id="coord"></span>
+</div>
+
+<div id="points_text_box">
+ <textarea id="points_text" cols="20" rows="5" readonly placeholder="No points"></textarea>
+  <button id="copy_points" onclick="copy_points()">Copy to clipboard</button>
+</div>
+
+<div id="about">
+ This is an interactive learning material of "correlation" in statistics.
+ Plot points interactively and observe the correlation to get a sense of it.
+ (Dotted lines represent the mean values of x and y.)
+</div>
+
+</body>
