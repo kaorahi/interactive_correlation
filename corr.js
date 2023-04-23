@@ -56,8 +56,8 @@ function update(p) {
 }
 
 function update_texts(p) {
-    const {corr} = get_corr()
-    Q('#corr').innerText = isNaN(corr) ? '' : corr.toFixed(2)
+    const {r} = get_corr()
+    Q('#corr').innerText = isNaN(r) ? '' : r.toFixed(2)
     Q('#sample_size').innerText = get_points().length
     Q('#coord').innerText = p ? `(${p})` : ''
     Q('#points_text').value = get_points_text()
@@ -153,9 +153,9 @@ function scroll_points_text() {
 
 function update_download_link() {
     const href = main_canvas.toDataURL('image/png')
-    const n = get_points().length, {corr} = get_corr()
-    const corr_text = isNaN(corr) ? 'NAN' : Math.round(corr * 100)
-    const download = `corr${corr_text}_${n}pts_${yymmdd_HHMMSS()}.png`
+    const n = get_points().length, {r} = get_corr()
+    const r_text = isNaN(r) ? 'NAN' : Math.round(r * 100)
+    const download = `corr${r_text}_${n}pts_${yymmdd_HHMMSS()}.png`
     Object.assign(Q('#download'), {href, download})
 }
 
@@ -243,8 +243,8 @@ function get_corr() {
     const [us, vs] = get_us_vs()
     const [std_u, std_v] = [us, vs].map(std)
     const cov_uv = cov(us, vs)
-    const corr = cov_uv / (std_u * std_v)
-    return {corr}
+    const r = cov_uv / (std_u * std_v)
+    return {r}
 }
 function get_mean_point() {return get_us_vs().map(mean)}
 
