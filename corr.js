@@ -49,17 +49,21 @@ function event_point(e) {
 // update
 
 function update(p) {
-    draw(p)
-    update_texts(p)
+    const corr = get_corr()
+    draw(corr, p)
+    update_texts(corr, p)
     update_buttons()
-    update_download_link()
+    update_download_link(corr)
 }
 
-function update_texts(p) {
-    const {r} = get_corr()
-    Q('#corr').innerText = isNaN(r) ? '' : r.toFixed(2)
-    Q('#sample_size').innerText = get_points().length
-    Q('#coord').innerText = p ? `(${p})` : ''
+function update_texts({r, a, b}, p) {
+    function set_text(key, val) {Q(key).innerText = val}
+    function to_text(val) {return val.toFixed(2)}
+    const [at, bt] = [a, Math.abs(b)].map(to_text), b_sign = b >= 0 ? '+' : '-'
+    set_text('#corr', isNaN(r) ? '' : to_text(r))
+    set_text('#regression', isNaN(b) ? '' : `y = ${at} x ${b_sign} ${bt}`)
+    set_text('#sample_size', get_points().length)
+    set_text('#coord',  p ? `(${p})` : '')
     Q('#points_text').value = get_points_text()
 }
 
@@ -76,11 +80,12 @@ function availability() {
 ///////////////////////////////////////////
 // draw
 
-function draw(p) {
+function draw({a, b}, p) {
     const g = main_canvas.getContext('2d')
     const ps = get_points(), n = ps.length
     clear(g)
     ps.map(pt => plot_point(g, pt, 'blue'))
+    plot_regression_line(g, a, b)
     n === 0 && big_message(g, 'Click here!', 'blue')
     n === 1 && big_message(g, 'Click more!', 'rgba(0,0,255,0.2)')
     n === 2 && big_message(g, 'More & more!', 'rgba(0,0,255,0.1)')
@@ -99,6 +104,13 @@ function plot_point(g, p, color) {
     g.strokeStyle = color; g.lineWidth = 2
     const radius = g.canvas.width * 0.01
     circle(g, ...p2xy(p), radius)
+}
+
+function plot_regression_line(g, a, b) {
+    const u = point_elem_range
+    const [x0, y0] = p2xy([0, b]), [x1, y1] = p2xy([u, a * u + b])
+    g.strokeStyle = 'red'; g.lineWidth = 2
+    line(g, x0, y0, x1, y1)
 }
 
 //////////////////////////////////////////////////
@@ -151,11 +163,12 @@ function scroll_points_text() {
 ///////////////////////////////////////////
 // download image
 
-function update_download_link() {
+function update_download_link({r, a, b}) {
+    function f2t(val) {return isNaN(val) ? 'NAN' : Math.round(val * 100)}
     const href = main_canvas.toDataURL('image/png')
-    const n = get_points().length, {r} = get_corr()
-    const r_text = isNaN(r) ? 'NAN' : Math.round(r * 100)
-    const download = `corr${r_text}_${n}pts_${yymmdd_HHMMSS()}.png`
+    const n = get_points().length
+    const [rt, at, bt] = [r, a, b].map(f2t)
+    const download = `r${rt}_a${at}_b${bt}_n${n}_${yymmdd_HHMMSS()}.png`
     Object.assign(Q('#download'), {href, download})
 }
 
@@ -244,7 +257,8 @@ function get_corr() {
     const [std_u, std_v] = [us, vs].map(std)
     const cov_uv = cov(us, vs)
     const r = cov_uv / (std_u * std_v)
-    return {r}
+    const a = cov_uv / (std_u ** 2), b = mean(vs) - a * mean(us)
+    return {r, a, b}
 }
 function get_mean_point() {return get_us_vs().map(mean)}
 

@@ -8,8 +8,9 @@
  <style type="text/css">
   #corr_box {font-size: large; margin-bottom: 1em;}
   #corr:not(:empty) {color: black; border: solid 1px black; padding: 0.2em;}
-  #corr:empty::before {content: "?"; color: gray;}
-  #sample_size_span {color: gray; margin-left: 1em;}
+  #corr:empty::before, #regression:empty::before {content: "?"; color: gray;}
+  #corr_box > span {margin-right: 1em;}
+  #sample_size_span {color: gray;}
   #main_canvas_box, #main_canvas {margin: 0px; padding: 0px;}
   #main_canvas {position: absolute; background: #eee;}
   #control_box {margin-top: 0.5em;}
@@ -25,8 +26,9 @@
 <h1>Interactive Correlation</h1>
 
 <div id="corr_box">
-correlation = <span id="corr"></span>
-<span id="sample_size_span">(<span id="sample_size"></span> points)</span>
+ <span>correlation: <span id="corr"></span></span>
+ <span>regression: <span id="regression"></span></span>
+ <span id="sample_size_span">(<span id="sample_size"></span> points)</span>
 </div>
 
 <div id="main_canvas_box">
