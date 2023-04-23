@@ -161,9 +161,9 @@ function update_download_link() {
 
 function yymmdd_HHMMSS() {
     const now = new Date()
-    function get(f) {return `0${now['get' + f]() + (f === 'Month' ? 1 : 0)}`.slice(-2)}
-    function g(...fs) {return fs.map(get).join('')}
-    return g('FullYear', 'Month', 'Date') + '_' + g('Hours', 'Minutes', 'Seconds')
+    function g(f) {return `0${now['get' + f]() + (f === 'Month' ? 1 : 0)}`.slice(-2)}
+    function gs(...fs) {return fs.map(g).join('')}
+    return gs('FullYear', 'Month', 'Date') + '_' + gs('Hours', 'Minutes', 'Seconds')
 }
 
 ///////////////////////////////////////////
