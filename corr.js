@@ -253,12 +253,16 @@ function big_message(ctx, text, color) {
 // correlation
 
 function get_corr() {
-    const [us, vs] = get_us_vs()
-    const [std_u, std_v] = [us, vs].map(std)
-    const cov_uv = cov(us, vs)
+    const {us, vs, std_u, std_v, cov_uv} = get_cov()
     const r = cov_uv / (std_u * std_v)
     const a = cov_uv / (std_u ** 2), b = mean(vs) - a * mean(us)
     return {r, a, b}
+}
+function get_cov() {
+    const [us, vs] = get_us_vs()
+    const [std_u, std_v] = [us, vs].map(std)
+    const cov_uv = cov(us, vs)
+    return {us, vs, std_u, std_v, cov_uv}
 }
 function get_mean_point() {return get_us_vs().map(mean)}
 
