@@ -59,15 +59,18 @@ function update(p) {
 function update_texts({r, a, b}, pca, p) {
     function set_text(key, val) {Q(key).innerText = val}
     function to_text(val) {return val.toFixed(2)}
+    function hide(t, c){set_class(Q(t), 'hidden', !Q(c).checked)}
     const [at, bt] = [a, Math.abs(b)].map(to_text), b_sign = b >= 0 ? '+' : '-'
     const [s1, s2] = pca.map(v => norm(v)**2), ssum = s1 + s2 || NaN
     const [c1, c2] = [s1, s2].map(s => to_text(s / ssum))
     set_text('#corr', isNaN(r) ? '' : to_text(r))
-    set_text('#regression', isNaN(b) ? '' : `y = ${at} x ${b_sign} ${bt}`)
-    set_text('#pca', isNaN(ssum) ? '' : `contribution ratio = ${c1}, ${c2}`)
+    set_text('#regression', isNaN(b) ? '' : `: y = ${at} x ${b_sign} ${bt}`)
+    set_text('#pca', isNaN(ssum) ? '' : `: contribution ratio = ${c1}, ${c2}`)
     set_text('#sample_size', get_points().length)
     set_text('#coord',  p ? `(${p})` : '')
     Q('#points_text').value = get_points_text()
+    hide('#regression', '#regression_check')
+    hide('#pca', '#pca_check')
 }
 
 function update_buttons() {
@@ -305,6 +308,7 @@ function std(a) {return Math.sqrt(cov(a, a))}
 // util
 
 function Q(selector) {return document.querySelector(selector)}
+function set_class(elem, klass, bool) {elem.classList[bool ? 'add' : 'remove'](klass)}
 
 let last_wink_animation = null
 function wink() {

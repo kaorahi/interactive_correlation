@@ -8,7 +8,7 @@
  <style type="text/css">
   #corr_box {font-size: large; margin-bottom: 1em;}
   #corr:not(:empty) {color: black; border: solid 1px black; padding: 0.2em;}
-  #corr:empty::before, #regression:empty::before, #pca:empty::before {content: "?"; color: gray;}
+  #corr:empty::before {content: "?"; color: gray;}
   #corr_box > span {margin-right: 1em;}
   #sample_size_span {color: gray;}
   #main_canvas_box, #main_canvas {margin: 0px; padding: 0px;}
@@ -18,6 +18,7 @@
   #points_text_box {margin-top: 1em;}
   #points_text {resize: none;}
   #about {color: gray; margin-top: 1em;}
+  .hidden {display: none;}
  </style>
 </head>
 
@@ -28,8 +29,14 @@
 <div id="corr_box">
  <span>correlation: <span id="corr"></span></span>
  <span id="sample_size_span">(<span id="sample_size"></span> points)</span><br>
- <span>regression: <span id="regression"></span></span><br>
- <span>PCA: <span id="pca"></span></span>
+ <label>
+  <input type="checkbox" id="regression_check" onclick="update()" checked>
+  regression<span id="regression"></span>
+ </label><br>
+ <label>
+  <input type="checkbox" id="pca_check" onclick="update()">
+  PCA<span id="pca"></span>
+ </label>
 </div>
 
 <div id="main_canvas_box">
@@ -42,8 +49,6 @@
  <button id="redo" onclick="redo()">redo</button>
  <button id="redo_all" onclick="redo_all()">redo all</button>
  <a id="download">Download image</a>
- <label><input type="checkbox" id="regression_check" onclick="update()" checked>regression</label>
- <label><input type="checkbox" id="pca_check" onclick="update()" checked>PCA</label>
  <span id="coord"></span>
 </div>
 
