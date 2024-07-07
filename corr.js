@@ -51,17 +51,20 @@ function event_point(e) {
 function update(p) {
     const corr = get_corr(), pca = get_pca()
     draw(corr, pca, p)
-    update_texts(corr, p)
+    update_texts(corr, pca, p)
     update_buttons()
     update_download_link(corr)
 }
 
-function update_texts({r, a, b}, p) {
+function update_texts({r, a, b}, pca, p) {
     function set_text(key, val) {Q(key).innerText = val}
     function to_text(val) {return val.toFixed(2)}
     const [at, bt] = [a, Math.abs(b)].map(to_text), b_sign = b >= 0 ? '+' : '-'
+    const [s1, s2] = pca.map(v => norm(v)**2), ssum = s1 + s2 || NaN
+    const [c1, c2] = [s1, s2].map(s => to_text(s / ssum))
     set_text('#corr', isNaN(r) ? '' : to_text(r))
     set_text('#regression', isNaN(b) ? '' : `y = ${at} x ${b_sign} ${bt}`)
+    set_text('#pca', isNaN(ssum) ? '' : `contribution ratio = ${c1}, ${c2}`)
     set_text('#sample_size', get_points().length)
     set_text('#coord',  p ? `(${p})` : '')
     Q('#points_text').value = get_points_text()
