@@ -49,8 +49,8 @@ function event_point(e) {
 // update
 
 function update(p) {
-    const corr = get_corr()
-    draw(corr, p)
+    const corr = get_corr(), pca = get_pca()
+    draw(corr, pca, p)
     update_texts(corr, p)
     update_buttons()
     update_download_link(corr)
@@ -80,16 +80,17 @@ function availability() {
 ///////////////////////////////////////////
 // draw
 
-function draw({a, b}, p) {
+function draw({a, b}, pca, p) {
     const g = main_canvas.getContext('2d')
-    const ps = get_points(), n = ps.length
+    const ps = get_points(), n = ps.length, p_mean = get_mean_point()
     clear(g)
     ps.map(pt => plot_point(g, pt, 'blue'))
     plot_regression_line(g, a, b)
+    plot_pca(g, pca, p_mean)
     n === 0 && big_message(g, 'Click here!', 'blue')
     n === 1 && big_message(g, 'Click more!', 'rgba(0,0,255,0.2)')
     n === 2 && big_message(g, 'More & more!', 'rgba(0,0,255,0.1)')
-    n > 0 && plot_mean(g, get_mean_point())
+    n > 0 && plot_mean(g, p_mean)
     p && plot_point(g, p, n > 0 ? 'rgba(0,0,0,0.2)' : 'red')
 }
 
@@ -111,6 +112,13 @@ function plot_regression_line(g, a, b) {
     const [x0, y0] = p2xy([0, b]), [x1, y1] = p2xy([u, a * u + b])
     g.strokeStyle = 'red'; g.lineWidth = 2
     line(g, x0, y0, x1, y1)
+}
+
+function plot_pca(g, pca, p_mean) {
+    g.strokeStyle = 'rgba(255,128,0,0.2)'; g.lineWidth = 10
+    const to_xy = uv => p2xy(elem_add(p_mean, uv))
+    const xys = uv => [1, -1].flatMap(c => to_xy(mul(uv, c)))
+    pca.forEach(uv => line(g, ...xys(uv)))
 }
 
 //////////////////////////////////////////////////
@@ -250,7 +258,7 @@ function big_message(ctx, text, color) {
 }
 
 //////////////////////////////////////////////////
-// correlation
+// correlation & PCA
 
 function get_corr() {
     const {us, vs, std_u, std_v, cov_uv} = get_cov()
@@ -265,6 +273,20 @@ function get_cov() {
     return {us, vs, std_u, std_v, cov_uv}
 }
 function get_mean_point() {return get_us_vs().map(mean)}
+
+function get_pca() {
+    const {std_u, std_v, cov_uv} = get_cov()
+    const mat = [[std_u**2, cov_uv], [cov_uv, std_v**2]]
+    const cook = ([lam, vec]) => mul(vec, Math.sqrt(lam))
+    return eigen(mat).map(cook)
+}
+function eigen([[a, b], [c, d]]) {
+    const tr = a + d, det = a * d - b * c
+    const sq = Math.sqrt(tr**2 - 4 * det)
+    const lam1 = (tr + sq) / 2, lam2 = (tr - sq) / 2
+    const [vec1, vec2] = [[b, lam1 - a], [lam2 - d, c]].map(normalize)
+    return [[lam1, vec1], [lam2, vec2]]
+}
 
 function get_us_vs() {
     const ps = get_points()
@@ -298,4 +320,10 @@ function sum(a) {return a.reduce((acc, z) => acc + z, 0)}
 function mean(a) {return sum(a) / a.length}
 function sub(a, c) {return a.map(z => z - c)}
 function mul(a, c) {return a.map(z => z * c)}
-function elem_prod(a, b) {return a.map((_, k) => a[k] * b[k])}
+function elem_gen(a, b, op) {return a.map((_, k) => op(a[k], b[k]))}
+function elem_prod(a, b) {return elem_gen(a, b, (s, t) => s * t)}
+function elem_add(a, b) {return elem_gen(a, b, (s, t) => s + t)}
+
+function inner(a, b) {return sum(elem_prod(a, b))}
+function norm(a) {return Math.sqrt(inner(a, a))}
+function normalize(a) {return mul(a, 1 / (norm(a) + 1e-8))}
