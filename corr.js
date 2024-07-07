@@ -168,7 +168,7 @@ function update_download_link({r, a, b}) {
     const href = main_canvas.toDataURL('image/png')
     const n = get_points().length
     const [rt, at, bt] = [r, a, b].map(f2t)
-    const download = `r${rt}_a${at}_b${bt}_n${n}_${yymmdd_HHMMSS()}.png`
+    const download = `icorr_r${rt}_a${at}_b${bt}_n${n}_${yymmdd_HHMMSS()}.png`
     Object.assign(Q('#download'), {href, download})
 }
 
